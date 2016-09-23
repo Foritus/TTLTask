@@ -74,11 +74,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddressFileProcessorTests.cs" />
+    <Compile Include="CSV\CSVReaderTests.cs" />
     <Compile Include="CSV\CSVReaderWriterTests.cs" />
+    <Compile Include="CSV\CSVWriterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="test_data\one-column.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="test_data\empty.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="test_data\contacts.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

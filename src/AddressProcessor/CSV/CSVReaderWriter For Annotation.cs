@@ -7,31 +7,38 @@ namespace AddressProcessing.CSV
         1) List three to five key concerns with this implementation that you would discuss with the junior developer. 
 
         Please leave the rest of this file as it is so we can discuss your concerns during the next stage of the interview process.
+
+        *) There are no tests covering the class's functionality.
         
         *) The design is overloaded and needlessly complex, violates SRP and DRY principles. The fact it has flags indicating behaviour is (pun unintended) a red flag that it 
         * should be split into subcomponents that perhaps share a common base class. This would be a breaking change however.
         
-        *) The class does not implement IDisposable despite having fields which manager native OS resources (file handles).
+        *) The class does not implement IDisposable despite having fields which manage native OS resources (file handles).
         
-        *) The first overload of Read() doesn't appear to understand the references are passed by value in the CLR, so the values for column1 and column2 are not 
-        * going to be visible to the caller. Is this function purely meant to be used for skipping a line? It should have a different name and no arguments if so.
+        *) The first overload of Read() doesn't appear to understand that references are passed by value in the CLR, so the values for column1 and column2 are not 
+        * going to be visible to the caller. Is this function purely meant to be used for analysing the next line? It should have a different name and no arguments if so.
         * This would be a breaking change however.
         
         *) The second overload of Read() is full of copy and paste from the first overload. If the two overloads are to be preserved, refactor them to use common functions.
-        * They should use "out" parameters so that the result values are passed to the caller and to ask the compiler to make sure the references are set before the end of the function
         
-        *) Write() should use a StringBuilder for its output buffer to reduce GC churn via too many string reallocs.
+        *) Write() could use a StringBuilder for its output buffer to reduce GC churn via too many string reallocs, or its entire implemetation could be replaced with a call to 
+        * string.Join("\t", columns) and just pass the result through to WriteLine().
         
-        *) Write()'s entire implemetation could be replaced with a call to string.Join("\t", columns) and just pass the result through to WriteLine().
-        
-        These are more minor than my other suggestions, but I thought I'd include them as I would when reviewing code anyway:
+        These are more minor or philosophical than my other suggestions, but I thought I'd include them as I would when reviewing code anyway:
+
+        *) The class is doing I/O in a synchronous fashion, which is a terrible idea for performance. Utilising Tasks and the threadpool/work stealing benefits therein would 
+        * be much more performant. Synchronous overloads could be maintained for backcompat, and just block while waiting for the IO to complete. The cost of a call to 
+        * WaitForSingleObject under the hood is still tiny compared to the cost of the I/O itself.
 
         *) The exception message in Open() is unhelpful, it should at least tell you the integer value of the underlying enum so the caller can try and root cause what invalid value they've
         * passed in (likely a default(T) value of 0 from an ORM or something similar)        
 
         *) The class should not have an "Open" method and instead just allocate streams in the constructor and tidy them up in Dispose() (perhaps with a call to GC.SupressFinalize() too). 
         * This would be a breaking change however.
-
+                
+        *) The class is not thread safe at all. But due to it mixing I/O from potentially the same file (one reader and one writer on the same file), I feel this is a problem
+        * best solved at a higher level of abstraction (So locking at the level of whatever is calling this object).
+        
         *) Read() should probably be called TryRead() to match .NET naming conventions for functions with side effects that may fail. This would be a breaking change however.
 
         *) The class appears to be reading and writing TSV data but this class is meant to be a CSV reader/writer? Bad name?
