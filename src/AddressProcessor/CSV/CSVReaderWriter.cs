@@ -11,6 +11,10 @@ namespace AddressProcessing.CSV
            Assume this code is in production and backwards compatibility must be maintained.
     */
 
+    /// <summary>
+    /// I'm assuming we need to maintain source-level back compat for this exercise, so that consumers don't take any compiler errors when updating to this library.
+    /// This constrains how tidy I can make the public interface, but I'll move the internals around.
+    /// </summary>
     public class CSVReaderWriter : IDisposable
     {
         [Flags]
